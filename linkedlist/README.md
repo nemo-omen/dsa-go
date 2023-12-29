@@ -27,12 +27,19 @@ Counter to many educational examples (and `List` in Go's standard library), outs
 ## Methods
 
 - [x] `Front() T`
+  - Returns the value held in the list's first element
 - [x] `Back() T`
+  - Returns the value held in the list's last element
 - [x] `At(index int) (T, error)`
+  - Returns the element at a given index
 - [x] `PushFront(value T)`
+  - Adds a value to the front of the list
 - [x] `PushBack(value T)`
-- [ ] `PopBack() (T, error)`
-- [ ] `PopFront() (T, error)`
+  - Adds a value to the back of the list
+- [x] `PopBack() (T, error)`
+  - Removes the last element in the list and returns the value of that element
+- [x] `PopFront() (T, error)`
+  - Removes the first element of the list and returns the value of that element
 - [ ] `Remove(value T) (T, error)`
 - [ ] `InsertBefore(value T, index?) (T, error)`
 - [ ] `InsertAfter(value T, index?) (T, error)`

@@ -1,3 +1,3 @@
-module jeffcaldwell.is/learn-go-with-tests
+module dsa-go
 
 go 1.21.5

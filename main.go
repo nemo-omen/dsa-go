@@ -1,19 +1,22 @@
 package main
 
 import (
-	"fmt"
-
 	"dsa-go/linkedlist"
+	"fmt"
 )
 
 func main() {
-	list := linkedlist.New[int]()
+	type Person struct {
+		name string
+		age  int
+	}
 
-	n := list.PushBack(1)
-	fmt.Println("list: ", list)
-	fmt.Println("n before: ", n)
-	n2 := list.PushBack(2)
-	fmt.Println("n after: ", n)
-	fmt.Println("n2: ", n2)
-	fmt.Println("list: ", list)
+	jeff := Person{
+		name: "Jeff",
+		age:  46,
+	}
+
+	list := linkedlist.New[Person]()
+	list.PushBack(jeff)
+	fmt.Println("List head: ", list.Head)
 }

@@ -59,3 +59,9 @@ The code works, but it could probably be a little more concise. Maybe do some mo
 
 ### 3. Initialize with Slice/Array
 You should be able to initialize a `LinkedList` from an array or slice.
+
+### 4. Sort?
+Seems like being able to sort a list would be a good thing.
+
+### 5. Iterator?
+I ought to probably implement an iterator for this. Of course, I'll have to learn how to do that with Go first.

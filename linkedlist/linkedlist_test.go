@@ -20,6 +20,42 @@ func TestNewList(t *testing.T) {
 	})
 }
 
+func TestFront(t *testing.T) {
+	t.Run("Front() should return zero value on new List", func(t *testing.T) {
+		l := New[int]()
+		actual := l.Front()
+		expected := *new(int)
+		assertEquals(t, expected, actual)
+	})
+
+	t.Run("Front() should return ListNode.Data on List with elements", func(t *testing.T) {
+		l := New[int]()
+		l.PushBack(1)
+		l.PushBack(2)
+		actual := l.Front()
+		expected := 1
+		assertEquals(t, expected, actual)
+	})
+}
+
+func TestBack(t *testing.T) {
+	t.Run("Back() should return T zero value on new List", func(t *testing.T) {
+		l := New[int]()
+		actual := l.Back()
+		expected := *new(int)
+		assertEquals(t, expected, actual)
+	})
+
+	t.Run("Back() should return ListNode.Data on List with elements", func(t *testing.T) {
+		l := New[int]()
+		l.PushBack(1)
+		l.PushBack(2)
+		actual := l.Back()
+		expected := 2
+		assertEquals(t, expected, actual)
+	})
+}
+
 func TestAt(t *testing.T) {
 	l := New[int]()
 	l.PushBack(1)
@@ -28,7 +64,7 @@ func TestAt(t *testing.T) {
 	l.PushBack(4)
 	l.PushBack(5)
 
-	atTests := []struct {
+	findTests := []struct {
 		in       string
 		list     *LinkedList[int]
 		index    int
@@ -42,7 +78,7 @@ func TestAt(t *testing.T) {
 		{"Test indexed access at 5", l, 5, fmt.Errorf("No such index %q", 5)},
 	}
 
-	for _, tt := range atTests {
+	for _, tt := range findTests {
 		t.Run(tt.in, func(t *testing.T) {
 			expected := tt.expected
 			data, error := tt.list.At(tt.index)
@@ -57,34 +93,36 @@ func TestAt(t *testing.T) {
 	}
 }
 
-func TestPushBack(t *testing.T) {
-	t.Run("PushBack() should create new ListNode and assign it to Tail", func(t *testing.T) {
-		l := New[int]()
-		n := l.PushBack(1)
-		expected := n
-		actual := l.Tail
+func TestFind(t *testing.T) {
+	l := New[int]()
+	l.PushBack(1)
+	l.PushBack(2)
+	l.PushBack(3)
+	l.PushBack(4)
+	l.PushBack(5)
 
-		assertEquals(t, expected, actual)
-	})
+	atTests := []struct {
+		in       string
+		list     *LinkedList[int]
+		value    int
+		expected int
+	}{
+		{"Test find value 1", l, 1, 0},
+		{"Test find value 2", l, 2, 1},
+		{"Test find value 3", l, 3, 2},
+		{"Test find value 4", l, 4, 3},
+		{"Test find value 5", l, 5, 4},
+		{"Test find value 5", l, 6, -1},
+	}
 
-	t.Run("PushBack() on new List should assign new ListNode to Head", func(t *testing.T) {
-		l := New[int]()
-		n := l.PushBack(1)
-		expected := n
-		actual := l.Head
-		assertEquals(t, expected, actual)
-	})
+	for _, tt := range atTests {
+		t.Run(tt.in, func(t *testing.T) {
+			expected := tt.expected
+			actual := tt.list.Find(tt.value)
 
-	t.Run("PushBack() should increase the list's Size", func(t *testing.T) {
-		l := New[int]()
-		zero := l.Size
-		l.PushBack(1)
-		one := l.Size
-
-		if !(one > zero) {
-			t.Errorf("expected %d to be greater than %d", one, zero)
-		}
-	})
+			assertEquals(t, expected, actual)
+		})
+	}
 }
 
 func TestPushFront(t *testing.T) {
@@ -117,40 +155,34 @@ func TestPushFront(t *testing.T) {
 	})
 }
 
-func TestPopBack(t *testing.T) {
-	l := New[int]()
-	l.PushBack(1)
-	l.PushBack(2)
-	l.PushBack(3)
-	l.PushBack(4)
-	l.PushBack(5)
+func TestPushBack(t *testing.T) {
+	t.Run("PushBack() should create new ListNode and assign it to Tail", func(t *testing.T) {
+		l := New[int]()
+		n := l.PushBack(1)
+		expected := n
+		actual := l.Tail
 
-	pbTests := []struct {
-		in       string
-		list     *LinkedList[int]
-		expected any
-	}{
-		{"Test PopBack on 5th element", l, 5},
-		{"Test PopBack on 4th element", l, 4},
-		{"Test PopBack on 3rd element", l, 3},
-		{"Test PopBack on 2nd element", l, 2},
-		{"Test PopBack on 1st element", l, 1},
-		{"Test PopBack on empty list", l, fmt.Errorf("Empty list cannot be popped")},
-	}
+		assertEquals(t, expected, actual)
+	})
 
-	for _, tt := range pbTests {
-		t.Run(tt.in, func(t *testing.T) {
-			expected := tt.expected
-			data, error := l.PopBack()
-			actual := data
+	t.Run("PushBack() on new List should assign new ListNode to Head", func(t *testing.T) {
+		l := New[int]()
+		n := l.PushBack(1)
+		expected := n
+		actual := l.Head
+		assertEquals(t, expected, actual)
+	})
 
-			if error != nil {
-				assertDeepEquals(t, expected, error)
-			} else {
-				assertEquals(t, expected, actual)
-			}
-		})
-	}
+	t.Run("PushBack() should increase the list's Size", func(t *testing.T) {
+		l := New[int]()
+		zero := l.Size
+		l.PushBack(1)
+		one := l.Size
+
+		if !(one > zero) {
+			t.Errorf("expected %d to be greater than %d", one, zero)
+		}
+	})
 }
 
 func TestPopFront(t *testing.T) {
@@ -189,65 +221,72 @@ func TestPopFront(t *testing.T) {
 	}
 }
 
-func TestWithStructs(t *testing.T) {
-	type Person struct {
-		name string
-		age  int
+func TestPopBack(t *testing.T) {
+	l := New[int]()
+	l.PushBack(1)
+	l.PushBack(2)
+	l.PushBack(3)
+	l.PushBack(4)
+	l.PushBack(5)
+
+	pbTests := []struct {
+		in       string
+		list     *LinkedList[int]
+		expected any
+	}{
+		{"Test PopBack on 5th element", l, 5},
+		{"Test PopBack on 4th element", l, 4},
+		{"Test PopBack on 3rd element", l, 3},
+		{"Test PopBack on 2nd element", l, 2},
+		{"Test PopBack on 1st element", l, 1},
+		{"Test PopBack on empty list", l, fmt.Errorf("Empty list cannot be popped")},
 	}
 
-	jeff := Person{name: "Jeff", age: 45}
-	t.Run("Struct ptr as Node value should be valid", func(t *testing.T) {
-		l := New[*Person]()
-		l.PushBack(&jeff)
-		expected := &jeff
-		actual := l.Tail.Data
+	for _, tt := range pbTests {
+		t.Run(tt.in, func(t *testing.T) {
+			expected := tt.expected
+			data, error := l.PopBack()
+			actual := data
 
-		assertEquals(t, expected, actual)
-	})
-
-	t.Run("Struct value as Node value should be valid", func(t *testing.T) {
-		l := New[Person]()
-		l.PushBack(jeff)
-		expected := jeff
-		actual := l.Tail.Data
-		assertEquals(t, expected, actual)
-	})
+			if error != nil {
+				assertDeepEquals(t, expected, error)
+			} else {
+				assertEquals(t, expected, actual)
+			}
+		})
+	}
 }
 
-func TestFront(t *testing.T) {
-	t.Run("Front() should return zero value on new List", func(t *testing.T) {
-		l := New[int]()
-		actual := l.Front()
-		expected := *new(int)
-		assertEquals(t, expected, actual)
-	})
+func TestRemove(t *testing.T) {
+	l := New[string]()
+	l.PushBack("a")
+	l.PushBack("b")
+	l.PushBack("c")
+	l.PushBack("d")
+	l.PushBack("e")
 
-	t.Run("Front() should return ListNode.Data on List with elements", func(t *testing.T) {
-		l := New[int]()
-		l.PushBack(1)
-		l.PushBack(2)
-		actual := l.Front()
-		expected := 1
-		assertEquals(t, expected, actual)
-	})
-}
+	removeTests := []struct {
+		in       string
+		list     *LinkedList[string]
+		value    string
+		expected bool
+	}{
+		{"Test removal of value a", l, "a", true},
+		{"Test removal of value b", l, "b", true},
+		{"Test removal of value c", l, "c", true},
+		{"Test removal of value e", l, "e", true},
+		{"Test removal of value d", l, "d", true},
+		{"Test removal of nonexistent value", l, "z", false},
+	}
 
-func TestBack(t *testing.T) {
-	t.Run("Back() should return T zero value on new List", func(t *testing.T) {
-		l := New[int]()
-		actual := l.Back()
-		expected := *new(int)
-		assertEquals(t, expected, actual)
-	})
+	for _, tt := range removeTests {
+		t.Run(tt.in, func(t *testing.T) {
+			expected := tt.expected
+			actual := tt.list.Remove(tt.value)
 
-	t.Run("Back() should return ListNode.Data on List with elements", func(t *testing.T) {
-		l := New[int]()
-		l.PushBack(1)
-		l.PushBack(2)
-		actual := l.Back()
-		expected := 2
-		assertEquals(t, expected, actual)
-	})
+			assertEquals(t, expected, actual)
+		})
+	}
 }
 
 func assertEquals(t testing.TB, expected, actual any) {

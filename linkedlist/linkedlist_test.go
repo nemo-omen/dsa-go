@@ -289,6 +289,37 @@ func TestRemove(t *testing.T) {
 	}
 }
 
+func TestRemoveAt(t *testing.T) {
+	removeTests := []struct {
+		in       string
+		index    int
+		expected bool
+	}{
+		{"Test removal at index 0", 0, true},
+		{"Test removal at index 1", 1, true},
+		{"Test removal at index 2", 2, true},
+		{"Test removal at index 3", 3, true},
+		{"Test removal at index 4", 4, true},
+		{"Test removal at index 5", 5, false},
+	}
+
+	for _, tt := range removeTests {
+		l := New[string]()
+		l.PushBack("a")
+		l.PushBack("b")
+		l.PushBack("c")
+		l.PushBack("d")
+		l.PushBack("e")
+
+		t.Run(tt.in, func(t *testing.T) {
+			expected := tt.expected
+			actual := l.RemoveAt(tt.index)
+
+			assertEquals(t, expected, actual)
+		})
+	}
+}
+
 func assertEquals(t testing.TB, expected, actual any) {
 	t.Helper()
 	if expected != actual {

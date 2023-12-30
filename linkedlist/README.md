@@ -46,3 +46,4 @@ Counter to many educational examples (and `List` in Go's standard library), outs
 - [ ] `InsertBefore(value T, index?) (T, error)`
 - [ ] `InsertAfter(value T, index?) (T, error)`
 - [ ] `Has(value T) boolean`
+- [ ] `toSlice() []T`

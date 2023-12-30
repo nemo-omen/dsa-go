@@ -320,6 +320,124 @@ func TestRemoveAt(t *testing.T) {
 	}
 }
 
+func TestInsertBefore(t *testing.T) {
+	l := New[int]()
+	l.PushBack(1)
+	l.PushBack(2)
+	l.PushBack(3)
+	l.PushBack(4)
+	l.PushBack(5)
+
+	insertBeforeTests := []struct {
+		in       string
+		list     *LinkedList[int]
+		value    int
+		index    int
+		expected bool
+	}{
+		{"Insert element before index 0", l, 6, 0, true},
+		{"Insert element before index 3", l, 7, 3, true},
+		{"Insert element before index 2", l, 8, 2, true},
+		{"Insert element before index 4", l, 9, 4, true},
+		{"Insert element before index 1", l, 10, 1, true},
+		{"Insert element before index 30", l, 11, 30, false},
+	}
+
+	for _, tt := range insertBeforeTests {
+		t.Run(tt.in, func(t *testing.T) {
+			actual := tt.list.InsertBefore(tt.value, tt.index)
+			assertEquals(t, tt.expected, actual)
+		})
+	}
+}
+
+func TestInsertAfter(t *testing.T) {
+	l := New[int]()
+	l.PushBack(1)
+	l.PushBack(2)
+	l.PushBack(3)
+	l.PushBack(4)
+	l.PushBack(5)
+
+	insertBeforeTests := []struct {
+		in       string
+		list     *LinkedList[int]
+		value    int
+		index    int
+		expected bool
+	}{
+		{"Insert element after index 0", l, 6, 0, true},
+		{"Insert element after index 3", l, 7, 3, true},
+		{"Insert element after index 2", l, 8, 2, true},
+		{"Insert element after index 4", l, 9, 4, true},
+		{"Insert element after index 1", l, 10, 1, true},
+		{"Insert element after index 30", l, 11, 30, false},
+	}
+
+	for _, tt := range insertBeforeTests {
+		t.Run(tt.in, func(t *testing.T) {
+			actual := tt.list.InsertAfter(tt.value, tt.index)
+			assertEquals(t, tt.expected, actual)
+		})
+	}
+}
+
+func TestToSlice(t *testing.T) {
+	l1 := New[int]()
+	l1.PushBack(1)
+	l1.PushBack(2)
+	l1.PushBack(3)
+
+	l2 := New[string]()
+	l2.PushBack("a")
+	l2.PushBack("b")
+	l2.PushBack("c")
+	type Whatever struct {
+		a string
+		b int
+	}
+
+	l3 := New[Whatever]()
+	l3.PushBack(Whatever{"hello", 1})
+	l3.PushBack(Whatever{"goodbye", 55})
+	l3.PushBack(Whatever{"what the hell are you?", 42})
+
+	l4 := New[int]()
+	l4.PushBack(1)
+
+	l5 := New[int]()
+
+	t.Run("Test LinkedList[int].ToSlice() returns slice of ints", func(t *testing.T) {
+		expected := []int{1, 2, 3}
+		actual := l1.ToSlice()
+		assertDeepEquals(t, expected, actual)
+	})
+
+	t.Run("Test LinkedList[string] returns slice of strings", func(t *testing.T) {
+		expected := []string{"a", "b", "c"}
+		actual := l2.ToSlice()
+		assertDeepEquals(t, expected, actual)
+	})
+
+	t.Run("Test LinkedList[struct] returns a slice of structs", func(t *testing.T) {
+		expected := []Whatever{{"hello", 1}, {"goodbye", 55}, {"what the hell are you?", 42}}
+		actual := l3.ToSlice()
+		assertDeepEquals(t, expected, actual)
+	})
+
+	t.Run("Test single element list returns single element slice", func(t *testing.T) {
+		expected := []int{1}
+		actual := l4.ToSlice()
+		assertDeepEquals(t, expected, actual)
+	})
+
+	t.Run("Test empty list returns empty slice", func(t *testing.T) {
+		expected := []int{}
+		actual := l5.ToSlice()
+		assertDeepEquals(t, expected, actual)
+	})
+}
+
 func assertEquals(t testing.TB, expected, actual any) {
 	t.Helper()
 	if expected != actual {

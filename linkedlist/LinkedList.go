@@ -119,6 +119,91 @@ func (l *LinkedList[T]) PushBack(value T) *ListNode[T] {
 	return l.Tail
 }
 
+func (l *LinkedList[T]) InsertBefore(value T, index int) bool {
+	if index > l.Size || index < 0 {
+		return false
+	}
+
+	n := ListNode[T]{nil, nil, value}
+
+	if index == 0 {
+		n.next = l.Head
+		l.Head.previous = &n
+		l.Head = &n
+		l.Size += 1
+		return true
+	} else if index == l.Size-1 {
+		a := l.Tail.previous
+		n.previous = a
+		a.next = &n
+		n.next = l.Tail
+		l.Tail.previous = &n
+		l.Size += 1
+		return true
+	}
+
+	current := l.Head
+	currentIndex := 0
+
+	for currentIndex < index {
+		current = current.next
+		currentIndex += 1
+	}
+
+	a := current.previous
+	a.next = &n
+	n.previous = a
+	n.next = current
+	current.previous = &n
+	l.Size += 1
+
+	return true
+}
+
+func (l *LinkedList[T]) InsertAfter(value T, index int) bool {
+	if index > l.Size || index < 0 {
+		return false
+	}
+
+	n := ListNode[T]{nil, nil, value}
+
+	if index == 0 {
+		n.previous = l.Head
+
+		if l.Head.next != nil {
+			n.next = l.Head.next
+		}
+
+		l.Head.next = &n
+		l.Size += 1
+		return true
+	} else if index == l.Size-1 {
+		n.previous = l.Tail
+		l.Tail.next = &n
+		l.Size += 1
+		return true
+	}
+
+	current := l.Head
+	currentIndex := 0
+
+	for currentIndex < index {
+		current = current.next
+		currentIndex += 1
+	}
+
+	a := current.next
+	b := current.next.next
+
+	a.next = &n
+	b.previous = &n
+	n.previous = a
+	n.next = b
+	l.Size += 1
+
+	return true
+}
+
 // Removes the first ListNode from the list and returns its value
 func (l *LinkedList[T]) PopFront() (T, error) {
 	if l.Head == nil {
@@ -214,4 +299,17 @@ func (l *LinkedList[T]) Remove(value T) bool {
 
 	result := l.RemoveAt(index)
 	return result
+}
+
+func (l *LinkedList[T]) ToSlice() []T {
+	arr := []T{}
+	if l.Size == 0 {
+		return arr
+	}
+	current := l.Head
+	for current != nil {
+		arr = append(arr, current.Data)
+		current = current.next
+	}
+	return arr
 }

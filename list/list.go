@@ -35,6 +35,8 @@ func (l *List[T]) Back() *Node[T] {
 	return l.root.Previous
 }
 
+// / Move "cursor" to an element at the given index.
+// / Iterates forward from beginning of list.
 func (l *List[T]) to(index int) *Node[T] {
 	currentIndex := 0
 	currentNode := l.root.Next
@@ -48,6 +50,8 @@ func (l *List[T]) to(index int) *Node[T] {
 	return currentNode
 }
 
+// / Move "cursor" to an element at a given index/
+// / Iterates backward from end of list.
 func (l *List[T]) reverseTo(index int) *Node[T] {
 	currentIndex := l.size - 1
 	currentNode := l.root.Previous
@@ -73,6 +77,8 @@ func (l *List[T]) At(index int) *Node[T] {
 		// to size - 1
 		rindex := (l.size - 1) + index
 		if rindex < 0 {
+			// if index is still negative
+			// don't loop (don't want to lap)
 			return nil
 		}
 		return l.At(rindex)
@@ -83,8 +89,6 @@ func (l *List[T]) At(index int) *Node[T] {
 	if l.size-index < index {
 		// If our index is closer to the back than
 		// the front, traverse backward
-		// NOTE: I think this reduces time complexity
-		// to O(log n) by reducing input size by half
 		node = l.reverseTo(index)
 	} else {
 		// Otherwise, traverse forward
@@ -93,6 +97,8 @@ func (l *List[T]) At(index int) *Node[T] {
 	return node
 }
 
+// / Finds a Node according to its value.
+// / Resuturns first occurrence of given value.
 func (l *List[T]) FindByValue(value T) *Node[T] {
 	currentNode := l.root.Next
 	for currentNode != l.root {
@@ -104,6 +110,22 @@ func (l *List[T]) FindByValue(value T) *Node[T] {
 	return nil
 }
 
+// / Returns the index of the given Node or -1 if not found.
+func (l *List[T]) FindIndex(node *Node[T]) int {
+	currentNode := l.root.Next
+	currentIndex := 0
+
+	for currentNode != l.root {
+		if currentNode == node {
+			return currentIndex
+		}
+		currentNode = currentNode.Next
+		currentIndex += 1
+	}
+	return -1
+}
+
+// / Adds value to back of list.
 func (l *List[T]) PushBack(v T) *Node[T] {
 	node := Node[T]{v, nil, nil}
 	if l.root.Previous != nil {
@@ -118,6 +140,7 @@ func (l *List[T]) PushBack(v T) *Node[T] {
 	return &node
 }
 
+// / Adds value to front of list.
 func (l *List[T]) PushFront(v T) *Node[T] {
 	node := Node[T]{v, nil, nil}
 	if l.root.Next != nil {
@@ -132,6 +155,8 @@ func (l *List[T]) PushFront(v T) *Node[T] {
 	return &node
 }
 
+// / Inserts value before a given index
+// / Returns a Node with the given value as Node.Data
 func (l *List[T]) InsertBefore(value T, index int) *Node[T] {
 	if index == 0 {
 		return l.PushFront(value)
@@ -150,6 +175,8 @@ func (l *List[T]) InsertBefore(value T, index int) *Node[T] {
 	return nil
 }
 
+// / Inserts a value after the given index
+// / Returns a Node with the value as Node.Data
 func (l *List[T]) InsertAfter(value T, index int) *Node[T] {
 	if index == l.size-1 {
 		return l.PushBack(value)
@@ -168,8 +195,10 @@ func (l *List[T]) InsertAfter(value T, index int) *Node[T] {
 	return nil
 }
 
+// / Removes a Node from the list
+// / returns true if successful, false if failed
 func (l *List[T]) Remove(node *Node[T]) bool {
-	if node == nil {
+	if node == l.root {
 		return false
 	}
 	node.Previous.Next = node.Next
@@ -177,30 +206,45 @@ func (l *List[T]) Remove(node *Node[T]) bool {
 	return true
 }
 
+// / Removes the node with the given value
+// / Returns true if successful, false if failed
 func (l *List[T]) RemoveByValue(value T) bool {
 	node := l.FindByValue(value)
 	return l.Remove(node)
 }
 
+// / Removes a Node at the given index
+// / Returns true if successful, false if failed
 func (l *List[T]) RemoveAt(index int) bool {
 	node := l.At(index)
 	return l.Remove(node)
 }
 
+// / Removes Node at end of list
+// / returns that Node if successful
+// / or nil if unsuccessful
 func (l *List[T]) PopBack() *Node[T] {
 	node := l.root.Previous
-	l.root.Previous = node.Previous
-	node.Previous.Next = l.root
-	return node
+	result := l.Remove(node)
+	if result == true {
+		return node
+	}
+	return nil
 }
 
+// / Removes Node at beginning of list
+// / returns that Node if successful
+// / or nil if unsuccessful
 func (l *List[T]) PopFront() *Node[T] {
 	node := l.root.Next
-	l.root.Next = node.Next
-	node.Next.Previous = l.root
-	return node
+	result := l.Remove(node)
+	if result == true {
+		return node
+	}
+	return nil
 }
 
+// / Returns a slice representation of the list
 func (l *List[T]) ToSlice() *[]T {
 	slice := []T{}
 	current := l.root.Next

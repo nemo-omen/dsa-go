@@ -32,4 +32,5 @@ func main() {
 	fmt.Println("ninesNode: ", ninesNode)
 	list.Remove(ninesNode)
 	fmt.Println(list.ToSlice())
+	fmt.Println(list.At(5))
 }

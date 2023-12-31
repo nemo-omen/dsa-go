@@ -4,11 +4,21 @@ import (
 	"fmt"
 )
 
+type Collection[T comparable] interface {
+	createIterator() Iterator[T]
+}
+
 // LinkedList is a doubly-linked list
 type LinkedList[T comparable] struct {
 	Head *ListNode[T]
 	Tail *ListNode[T]
 	Size int
+}
+
+func (l *LinkedList[T]) createIterator() Iterator[T] {
+	return &LinkedListIterator[T]{
+		list: l,
+	}
 }
 
 // Initializes a new LinkedList with nil Head,

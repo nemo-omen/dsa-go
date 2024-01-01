@@ -1,10 +1,16 @@
 package list
 
+import "reflect"
+
 type List[T comparable] struct {
 	root *Node[T]
 	size int
 }
 
+// / Initializes a list with a sentinel node
+// / This is technically a circular, doubly-linked
+// / list. The root node contains no Data and serves
+// / to point to the first and last elements.
 func (l *List[T]) Init() *List[T] {
 	l.root = &Node[T]{}
 	l.root.Next = l.root
@@ -13,14 +19,35 @@ func (l *List[T]) Init() *List[T] {
 	return l
 }
 
+// / Initialize and return an initialized List
 func New[T comparable]() *List[T] {
 	return new(List[T]).Init()
 }
 
+// / Create a list from a slice
+func NewFromSlice[T comparable](slice []T) *List[T] {
+	l := new(List[T]).Init()
+
+	for _, el := range slice {
+		l.PushBack(el)
+	}
+	return l
+}
+
+/// Create an iterator for the List
+
+func (l *List[T]) CreateIterator() *ListIterator[T] {
+	return &ListIterator[T]{0, l}
+}
+
+// / Returns the number of elements in the list
 func (l *List[T]) Size() int {
 	return l.size
 }
 
+// ELEMENT ACCESS //
+
+// / Returns the first Node in the list
 func (l *List[T]) Front() *Node[T] {
 	if l.size == 0 {
 		return nil
@@ -28,6 +55,7 @@ func (l *List[T]) Front() *Node[T] {
 	return l.root.Next
 }
 
+// / Returns the last Node in the list
 func (l *List[T]) Back() *Node[T] {
 	if l.size == 0 {
 		return nil
@@ -125,10 +153,12 @@ func (l *List[T]) FindIndex(node *Node[T]) int {
 	return -1
 }
 
+// ELEMENT INSERTION //
+
 // / Adds value to back of list.
 func (l *List[T]) PushBack(v T) *Node[T] {
 	node := Node[T]{v, nil, nil}
-	if l.root.Previous != nil {
+	if !reflect.DeepEqual(l.root, l.root.Previous) {
 		l.root.Previous.Next = &node
 	} else {
 		l.root.Next = &node
@@ -143,7 +173,7 @@ func (l *List[T]) PushBack(v T) *Node[T] {
 // / Adds value to front of list.
 func (l *List[T]) PushFront(v T) *Node[T] {
 	node := Node[T]{v, nil, nil}
-	if l.root.Next != nil {
+	if !reflect.DeepEqual(l.root, l.root.Next) {
 		l.root.Next.Previous = &node
 	} else {
 		l.root.Previous = &node
@@ -195,6 +225,8 @@ func (l *List[T]) InsertAfter(value T, index int) *Node[T] {
 	return nil
 }
 
+// ELEMENT REMOVAL //
+
 // / Removes a Node from the list
 // / returns true if successful, false if failed
 func (l *List[T]) Remove(node *Node[T]) bool {
@@ -224,7 +256,7 @@ func (l *List[T]) RemoveAt(index int) bool {
 // / returns that Node if successful
 // / or nil if unsuccessful
 func (l *List[T]) PopBack() *Node[T] {
-	node := l.root.Previous
+	node := l.Back()
 	result := l.Remove(node)
 	if result == true {
 		return node
@@ -236,13 +268,15 @@ func (l *List[T]) PopBack() *Node[T] {
 // / returns that Node if successful
 // / or nil if unsuccessful
 func (l *List[T]) PopFront() *Node[T] {
-	node := l.root.Next
+	node := l.Front()
 	result := l.Remove(node)
 	if result == true {
 		return node
 	}
 	return nil
 }
+
+// UTIL //
 
 // / Returns a slice representation of the list
 func (l *List[T]) ToSlice() *[]T {
@@ -253,4 +287,20 @@ func (l *List[T]) ToSlice() *[]T {
 		current = current.Next
 	}
 	return &slice
+}
+
+// / Runs a given function over all elements of the list
+// / Function must return the same type as the list
+// / Returns a new list.
+func (l *List[T]) Map(f func(T) T) *List[T] {
+	newList := New[T]()
+	currentNode := l.Front()
+
+	for currentNode != l.root {
+		data := currentNode.Data
+		transformed := f(data)
+		newList.PushBack(transformed)
+		currentNode = currentNode.Next
+	}
+	return newList
 }
